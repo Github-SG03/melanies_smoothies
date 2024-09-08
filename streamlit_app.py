@@ -32,8 +32,10 @@ if ingredients_list:
     # Concatenate the fruits with spaces between them
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
-       # New section to display fruityvice nutrition information
-        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/watermelon")
+        #Use Our fruit_chosen Variable in the API Call
+        st.subheader=(fruit_chosen + 'Nutrition Information')
+        # New section to display fruityvice nutrition information
+        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" +fruit_chosen)
         fv_df=st.dataframe(data=fruityvice_response.json(),use_container_width=True)
     
     # Optionally strip the last space
