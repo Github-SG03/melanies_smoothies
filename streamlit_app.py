@@ -46,11 +46,17 @@ if ingredients_list:
 
         # Display fruityvice nutrition information
         st.subheader(fruit_chosen + ' Nutrition Information')
-        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_chosen)
-        fv_df=st.dataframe(fruityvice_response.json(), use_container_width=True)
-    
-    # Optionally strip the last space
-    #ingredients_string = ingredients_string.strip()
+        fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit_chosen}")
+
+        if fruityvice_response.status_code == 200:
+            data = fruityvice_response.json()
+            if isinstance(data, dict):
+                df = pd.json_normalize(data)
+                st.dataframe(df, use_container_width=True)
+            else:
+                st.write("Error: Unexpected API response format.")
+        else:
+            st.write("Error: Unable to fetch data from Fruityvice.")
 
     my_insert_stmts = f"""INSERT INTO smoothies.public.orders(ingredients, name_on_order)
             VALUES ('{ingredients_string}', '{name_on_order}')"""
