@@ -40,23 +40,35 @@ if ingredients_list:
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
 
+        # Debugging: Check the value of fruit_chosen
+        st.write(f"Debug: Processing fruit: {fruit_chosen}")
+
         # Get the "Search On" value
         search_on = pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
         st.write('The search value for', fruit_chosen, 'is', search_on, '.')
 
         # Display fruityvice nutrition information
         st.subheader(fruit_chosen + ' Nutrition Information')
+
+        # Request nutrition information
         fruityvice_response = requests.get(f"https://fruityvice.com/api/fruit/{fruit_chosen}")
 
+        # Check if the API response is successful
         if fruityvice_response.status_code == 200:
-            data = fruityvice_response.json()
-            if isinstance(data, dict):
-                df = pd.json_normalize(data)
-                st.dataframe(df, use_container_width=True)
-            else:
-                st.write("Error: Unexpected API response format.")
+            try:
+                data = fruityvice_response.json()
+                # Debugging: Check the format of the data
+                st.write(f"Debug: Received data: {data}")
+
+                if isinstance(data, dict):
+                    df = pd.json_normalize(data)
+                    st.dataframe(df, use_container_width=True)
+                else:
+                    st.write("Error: Unexpected API response format.")
+            except Exception as e:
+                st.write(f"Error: Failed to parse API response. Exception: {e}")
         else:
-            st.write("Error: Unable to fetch data from Fruityvice.")
+            st.write(f"Error: Unable to fetch data from Fruityvice. Status code: {fruityvice_response.status_code}")
 
     my_insert_stmts = f"""INSERT INTO smoothies.public.orders(ingredients, name_on_order)
             VALUES ('{ingredients_string}', '{name_on_order}')"""
@@ -65,5 +77,8 @@ if ingredients_list:
     time_to_insert = st.button('Submit Order')
     
     if time_to_insert:
-        session.sql(my_insert_stmts).collect()
-        st.success('Your Smoothie is ordered!', icon="✅")
+        try:
+            session.sql(my_insert_stmts).collect()
+            st.success('Your Smoothie is ordered!', icon="✅")
+        except Exception as e:
+            st.write(f"Error: Failed to submit order. Exception: {e}")
