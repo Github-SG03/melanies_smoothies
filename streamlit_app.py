@@ -47,8 +47,7 @@ if ingredients_list:
         # Display fruityvice nutrition information
         st.subheader(fruit_chosen + 'Nutrition Information')
         fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_chosen)
-        fv_df = pd.DataFrame(fruityvice_response.json())  # Convert the response to a DataFrame
-        st.dataframe(data=fv_df, use_container_width=True)
+        fv_df=st.dataframe(data=fruityvice_response.json(),use_container_width=True)
     
     # Optionally strip the last space
     ingredients_string = ingredients_string.strip()
