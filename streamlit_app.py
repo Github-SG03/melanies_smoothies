@@ -18,8 +18,8 @@ st.write('Name on smoothie will be', name_on_order)
 cnx=st.connection("snowflake")
 session = cnx.session()
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'),col('SEARCH_ON'))
-st.dataframe(data=my_dataframe, use_container_width=True)
-st.stop()
+#st.dataframe(data=my_dataframe, use_container_width=True)
+#st.stop()
 
 #convert the snowspark dataframe to pandas dataframe so that we can use the LOC function
 pd_df=my_dataframe.to_pandas()
@@ -42,8 +42,8 @@ if ingredients_list:
         ingredients_string += fruit_chosen + ' '
 
         #A Strange-Looking Statement That Will Get Us the "Search On" Value
-        search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
-        st.write('The search value for ', fruit_chosen,' is ', search_on, '.')
+        #search_on=pd_df.loc[pd_df['FRUIT_NAME'] == fruit_chosen, 'SEARCH_ON'].iloc[0]
+        #st.write('The search value for ', fruit_chosen,' is ', search_on, '.')
        
         #Use Our fruit_chosen Variable in the API Call
         st.subheader=(fruit_chosen + 'Nutrition Information')
