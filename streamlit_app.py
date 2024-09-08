@@ -44,7 +44,7 @@ if ingredients_list:
         st.write('The search value for', fruit_chosen, 'is', search_on, '.')
 
         # Display fruityvice nutrition information
-        st.subheader(fruit_chosen + ' Nutrition Information')
+        st.subheader(fruit_chosen + 'Nutrition Information')
 
         # Handle API request and potential errors
         try:
