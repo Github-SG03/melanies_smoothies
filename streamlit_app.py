@@ -36,7 +36,6 @@ ingredients_list = st.multiselect(
 if ingredients_list:
     ingredients_string = ''
     
-    # Concatenate the fruits with spaces between them
     for fruit_chosen in ingredients_list:
         ingredients_string += fruit_chosen + ' '
 
@@ -45,9 +44,25 @@ if ingredients_list:
         st.write('The search value for', fruit_chosen, 'is', search_on, '.')
 
         # Display fruityvice nutrition information
-        st.subheader(fruit_chosen + 'Nutrition Information')
-        fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_chosen)
-        fv_df=st.dataframe(data=fruityvice_response.json(),use_container_width=True)
+        st.subheader(fruit_chosen + ' Nutrition Information')
+
+        # Handle API request and potential errors
+        try:
+            fruityvice_response = requests.get("https://fruityvice.com/api/fruit/" + fruit_chosen)
+            fruityvice_response.raise_for_status()  # Raise an exception for HTTP errors
+            fv_data = fruityvice_response.json()
+            
+            if isinstance(fv_data, dict):  # Check if the response is a dictionary
+                fv_df = pd.DataFrame([fv_data])  # Convert the dictionary to a DataFrame
+            else:
+                fv_df = pd.DataFrame(fv_data)  # Convert the list to a DataFrame
+            
+            st.dataframe(data=fv_df, use_container_width=True)
+        
+        except requests.RequestException as e:
+            st.error(f"An error occurred while fetching nutrition information for {fruit_chosen}: {e}")
+        except ValueError as e:
+            st.error(f"Error processing the nutrition information for {fruit_chosen}: {e}")
     
     # Optionally strip the last space
     ingredients_string = ingredients_string.strip()
@@ -59,5 +74,8 @@ if ingredients_list:
     time_to_insert = st.button('Submit Order')
     
     if time_to_insert:
-        session.sql(my_insert_stmts).collect()
-        st.success('Your Smoothie is ordered!', icon="✅")
+        try:
+            session.sql(my_insert_stmts).collect()
+            st.success('Your Smoothie is ordered!', icon="✅")
+        except Exception as e:
+            st.error(f"An error occurred while placing your order: {e}")
