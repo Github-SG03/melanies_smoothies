@@ -30,6 +30,7 @@ st.dataframe(pd_df)                                                             
 ingredients_list = st.multiselect(
     'Choose upto five ingredients:',
     my_dataframe,
+    pd_df['FRUIT_NAME'].tolist(),
     max_selections=5
 
 )
